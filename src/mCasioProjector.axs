@@ -138,7 +138,7 @@ DEFINE_MUTUALLY_EXCLUSIVE
 (* EXAMPLE: DEFINE_FUNCTION <RETURN_TYPE> <NAME> (<PARAMETERS>) *)
 (* EXAMPLE: DEFINE_CALL '<NAME>' (<PARAMETERS>) *)
 define_function SendStringRaw(char cParam[]) {
-    NAVLog(NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_STRING_TO, dvPort, cParam))
+    NAVErrorLog(NAV_LOG_LEVEL_DEBUG, NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_STRING_TO, dvPort, cParam))
     send_string dvPort,"cParam"
 }
 
@@ -188,7 +188,7 @@ define_function Process() {
 	cTemp = remove_string(cRxBuffer, "'#', NAV_CR, NAV_LF", 1)
 
 	if (length_array(cTemp)) {
-	    NAVLog(NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_PARSING_STRING_FROM, dvPort, cTemp))
+	    NAVErrorLog(NAV_LOG_LEVEL_DEBUG, NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_PARSING_STRING_FROM, dvPort, cTemp))
 	    cTemp = NAVStripCharsFromRight(cTemp, 3)	//Removes # CR LF
 	    if (length_array(cTemp)) {
 		stack_var cJunk[NAV_MAX_BUFFER]
@@ -250,7 +250,7 @@ define_function Drive() {
 	    if (uProj.Display.VideoMute.Required && (uProj.Display.VideoMute.Required == uProj.Display.VideoMute.Actual)) { uProj.Display.VideoMute.Required = 0; }
 	    //if ((uProj.Display.Volume.Level.Required >= 0) && (uProj.Display.Volume.Level.Required == uProj.Display.Volume.Level.Actual)) { uProj.Display.Volume.Level.Required = -1; }
 
-	    if (uProj.Display.VideoMute.Required && (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) && (uProj.Display.VideoMute.Required <> uProj.Display.VideoMute.Actual) && iCommunicating) {
+	    if (uProj.Display.VideoMute.Required && (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) && (uProj.Display.VideoMute.Required != uProj.Display.VideoMute.Actual) && iCommunicating) {
 		iCommandBusy = true
 		SetMute(uProj.Display.VideoMute.Required);
 		wait 10 iCommandBusy = false
@@ -258,7 +258,7 @@ define_function Drive() {
 		return
 	    }
 
-	    if (uProj.Display.PowerState.Required && (uProj.Display.PowerState.Required <> uProj.Display.PowerState.Actual) && (uProj.Display.PowerState.Actual <> ACTUAL_POWER_WARMING) && (uProj.Display.PowerState.Actual <> ACTUAL_POWER_COOLING) && iCommunicating) {
+	    if (uProj.Display.PowerState.Required && (uProj.Display.PowerState.Required != uProj.Display.PowerState.Actual) && (uProj.Display.PowerState.Actual != ACTUAL_POWER_WARMING) && (uProj.Display.PowerState.Actual != ACTUAL_POWER_COOLING) && iCommunicating) {
 		iCommandBusy = true
 		iPollingEnabled = false
 		//iQueryLockOut = true
@@ -273,7 +273,7 @@ define_function Drive() {
 		return
 	    }
 
-	    if (uProj.Display.Input.Required && (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) && (uProj.Display.Input.Required <> uProj.Display.Input.Actual) && iCommunicating) {
+	    if (uProj.Display.Input.Required && (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) && (uProj.Display.Input.Required != uProj.Display.Input.Actual) && iCommunicating) {
 		iCommandBusy = true
 		SetInput(uProj.Display.Input.Required)
 		wait 10 iCommandBusy = false
@@ -295,7 +295,7 @@ define_function Drive() {
 		SendString('VOL DEC')
 	    }
 
-	    if ((uProj.Display.Volume.Level.Required >= 0) && (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) && (uProj.Display.Volume.Level.Required <> uProj.Display.Volume.Level.Actual) && iCommunicating) {
+	    if ((uProj.Display.Volume.Level.Required >= 0) && (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) && (uProj.Display.Volume.Level.Required != uProj.Display.Volume.Level.Actual) && iCommunicating) {
 		iCommandBusy = true
 		SetVolume(uProj.Display.Volume.Level.Required);
 		iPollSequence = GET_VOLUME;
@@ -348,7 +348,7 @@ DEFINE_START {
 DEFINE_EVENT
 data_event[dvPort] {
     online: {
-	if (data.device.number <> 0) {
+	if (data.device.number != 0) {
 	    send_command data.device,"'SET BAUD 9600,N,8,1 485 DISABLE'"
 	    send_command data.device,"'B9MOFF'"
 	    send_command data.device,"'CHARD-0'"
@@ -366,7 +366,7 @@ data_event[dvPort] {
 	iCommunicating = true
 	iInitialized = true
 	TimeOut()
-	NAVLog(NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_STRING_FROM, dvPort, data.text))
+	NAVErrorLog(NAV_LOG_LEVEL_DEBUG, NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_STRING_FROM, dvPort, data.text))
 	if (!iSemaphore) { Process() }
     }
     offline: {
@@ -392,7 +392,7 @@ data_event[vdvObject] {
 	stack_var char cCmdHeader[NAV_MAX_CHARS]
 	stack_var char cCmdParam[2][NAV_MAX_CHARS]
 
-	NAVLog(NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_COMMAND_FROM, data.device, data.text))
+	NAVErrorLog(NAV_LOG_LEVEL_DEBUG, NAVFormatStandardLogMessage(NAV_STANDARD_LOG_MESSAGE_TYPE_COMMAND_FROM, data.device, data.text))
 
 	cCmdHeader = DuetParseCmdHeader(data.text)
 	cCmdParam[1] = DuetParseCmdParam(data.text)
@@ -406,7 +406,7 @@ data_event[vdvObject] {
 		    }
 		    case 'TCP_PORT': {
 			iTCPPort = atoi(cCmdParam[2])
-			timeline_create(TL_IP_CHECK,ltIPCheck,length_array(ltIPCheck),timeline_absolute,timeline_repeat)
+			NAVTimelineStart(TL_IP_CHECK,ltIPCheck,timeline_absolute,timeline_repeat)
 		    }
 		}
 	    }
@@ -473,9 +473,9 @@ data_event[vdvObject] {
 		}
 	    }
 	    case 'MUTE': {
-		//NAVLog('RECEIVED MUTE COMMAND')
+		//NAVErrorLog(NAV_LOG_LEVEL_DEBUG, 'RECEIVED MUTE COMMAND')
 		if (uProj.Display.PowerState.Actual == ACTUAL_POWER_ON) {
-		//NAVLog('RECEIVED MUTE COMMAND')
+		//NAVErrorLog(NAV_LOG_LEVEL_DEBUG, 'RECEIVED MUTE COMMAND')
 		    switch (cCmdParam[1]) {
 			case 'ON': { uProj.Display.VideoMute.Required = REQUIRED_MUTE_ON; Drive() }
 			case 'OFF': { uProj.Display.VideoMute.Required = REQUIRED_MUTE_OFF; Drive() }
