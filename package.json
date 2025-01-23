@@ -1,7 +1,7 @@
 {
-    "name": "NAVDatabase.Amx.CasioProjector",
+    "name": "navdatabase.amx.casioprojector",
+    "displayName": "NAVDatabase.Amx.CasioProjector",
     "version": "1.0.0",
-    "private": true,
     "keywords": [
         "amx",
         "netlinx",
@@ -14,34 +14,36 @@
         "url": "https://github.com/Norgate-AV/NAVDatabase.Amx.CasioProjector.git"
     },
     "bugs": {
-        "url": "https://github.com/Norgate-AV/NAVDatabase.Amx.CasioProjectork/issues"
+        "url": "https://github.com/Norgate-AV/NAVDatabase.Amx.CasioProjector/issues"
     },
     "engines": {
-        "node": ">=14"
+        "node": ">=20"
     },
     "scripts": {
         "build": "pwsh ./build.ps1",
         "commit": "git-cz",
-        "prepare": "husky install",
+        "prepare": "husky && dropnode",
         "pretty:fix": "prettier --write .",
         "doctoc": "doctoc README.md",
         "contrib:add": "all-contributors add",
         "contrib:generate": "all-contributors generate",
-        "contrib:check": "all-contributors check",
-        "size": "size-limit",
-        "analyze": "size-limit --why"
+        "contrib:check": "all-contributors check"
     },
     "devDependencies": {
-        "@commitlint/cli": "^17.4.4",
-        "@commitlint/config-conventional": "^17.4.4",
-        "@norgate-av/genlinx": "^1.0.0",
-        "all-contributors-cli": "^6.24.0",
-        "commitizen": "^4.3.0",
+        "@commitlint/cli": "^19.6.1",
+        "@commitlint/config-conventional": "^19.6.0",
+        "@norgate-av/dropnode": "^1.0.0",
+        "@norgate-av/genlinx": "^2.6.1",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/exec": "^6.0.3",
+        "@semantic-release/git": "^10.0.1",
+        "all-contributors-cli": "^6.26.1",
+        "commitizen": "^4.3.1",
         "cz-conventional-changelog": "3.3.0",
         "doctoc": "^2.2.1",
-        "husky": "^8.0.3",
-        "lint-staged": "^14.0.1",
-        "prettier": "^3.0.3",
-        "size-limit": "^9.0.0"
+        "husky": "^9.1.7",
+        "lint-staged": "^15.4.0",
+        "prettier": "^3.4.2",
+        "semantic-release": "^24.2.1"
     }
 }
